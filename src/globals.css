@@ -201,7 +201,7 @@
   }
 
   .file_uploader-box {
-    @apply flex-center flex-col p-7 h-80 lg:h-[612px];
+    @apply flex-center flex-col p-7 h-80 lg:h-[412px];
   }
 
   /* Grid Post List */
@@ -271,7 +271,7 @@
   }
 
   .shad-button_dark_4 {
-    @apply h-12 bg-dark-4 px-5 text-light-1 flex gap-2 !important;
+    @apply h-12 bg-dark-4 px-5 text-light-1 flex gap-2 hover:bg-neutral-800 !important;
   }
 
   .shad-button_ghost {

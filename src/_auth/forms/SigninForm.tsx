@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import * as z from "zod";
 
 import Loader from "@/components/shared/Loader";
 import {
@@ -45,6 +45,7 @@ const SigninForm = () => {
 
     if (!session) {
       return toast({
+        variant: "destructive",
         title: "Sign In Failed, Please try again",
       });
     }
@@ -56,6 +57,7 @@ const SigninForm = () => {
       navigate("/");
     } else {
       return toast({
+        variant: "destructive",
         title: "Sign In Failed, Please try again",
       });
     }

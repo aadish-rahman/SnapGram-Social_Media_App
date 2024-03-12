@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import * as z from "zod";
 
 import Loader from "@/components/shared/Loader";
 import {
@@ -50,6 +50,7 @@ const SignupForm = () => {
     if (!newUser) {
       return toast({
         title: "SignUp Failed, Please try again",
+        variant: "destructive",
       });
     }
 
@@ -61,6 +62,7 @@ const SignupForm = () => {
     if (!session) {
       return toast({
         title: "Sign In Failed, Please try again",
+        variant: "destructive",
       });
     }
 
@@ -72,6 +74,7 @@ const SignupForm = () => {
     } else {
       return toast({
         title: "Sign In Failed, Please try again",
+        variant: "destructive",
       });
     }
   }
