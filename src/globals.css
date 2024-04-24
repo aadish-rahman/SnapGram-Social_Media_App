@@ -20,6 +20,11 @@
     @apply text-[36px] font-bold leading-[140%] tracking-tighter;
   }
 
+  .text-primary {
+    --text-opacity: 1;
+    color: rgb(135 126 255 / var(--text-opacity));
+  }
+
   .h1-semibold {
     @apply text-[36px] font-semibold leading-[140%] tracking-tighter;
   }
@@ -262,7 +267,7 @@
   }
 
   .shad-textarea {
-    @apply h-36 bg-dark-3 rounded-xl border-none focus-visible:ring-1 focus-visible:ring-offset-1 ring-offset-light-3 !important;
+    @apply h-36 bg-dark-4 rounded-xl border-none focus-visible:ring-1 focus-visible:ring-offset-1 ring-offset-light-3 !important;
   }
 
   /* Button */

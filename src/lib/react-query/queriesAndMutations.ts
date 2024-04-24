@@ -1,4 +1,4 @@
-import { INewPost, INewUser, IUpdatePost } from "@/types";
+import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
 import {
   useInfiniteQuery,
   useMutation,
@@ -13,13 +13,17 @@ import {
   getCurrentUser,
   getInfinitePosts,
   getPostById,
+  getPostDocumentsByPostIds,
   getRecentPosts,
+  getSavedPostDocumentsByUserId,
+  getUserById,
   likePost,
   savePost,
   searchPosts,
   signInAccount,
   signOutAccount,
   updatePost,
+  updateUserDetails,
 } from "../appwrite/api";
 import { QUERY_KEYS } from "./queryKeys";
 
@@ -189,5 +193,38 @@ export const useSearchPosts = (searchTerm: string) => {
     queryKey: [QUERY_KEYS.SEARCH_POSTS, searchTerm],
     queryFn: async () => await searchPosts(searchTerm),
     enabled: !!searchTerm,
+  });
+};
+
+export const useGetSavedPostDocumentsByUserId = (userId: string) => {
+  return useQuery({
+    queryKey: ["savedPostDocuments", userId],
+    queryFn: () => getSavedPostDocumentsByUserId(userId),
+  });
+};
+
+export const useGetPostDocumentsByPostIds = (postIds: string[]) => {
+  return useQuery({
+    queryKey: ["postDocuments", postIds],
+    queryFn: () => getPostDocumentsByPostIds(postIds),
+  });
+};
+
+export const useGetUserById = (userId: string) => {
+  return useQuery({
+    queryKey: ["user", userId],
+    queryFn: () => getUserById(userId),
+  });
+};
+
+export const useUpdateUserDetails = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (user: IUpdateUser) => updateUserDetails(user),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["user"],
+      });
+    },
   });
 };

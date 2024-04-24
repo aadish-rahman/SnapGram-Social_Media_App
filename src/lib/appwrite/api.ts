@@ -1,4 +1,4 @@
-import { INewPost, INewUser, IUpdatePost } from "@/types";
+import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
 import { ID, Query } from "appwrite";
 import { account, appwriteConfig, avatars, databases, storage } from "./config";
 
@@ -226,7 +226,7 @@ export async function savePost(postId: string, userId: string) {
     if (!updatedPost) {
       throw Error;
     }
-
+    console.log(updatedPost);
     return updatedPost;
   } catch (error) {
     console.log(error);
@@ -372,5 +372,83 @@ export async function searchPosts(searchTerm: string) {
     return posts.documents;
   } catch (error) {
     console.log("Error searching posts: ", error);
+  }
+}
+
+export async function getSavedPostDocumentsByUserId(userId: string) {
+  try {
+    const savedPosts = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.savesCollectionId,
+      [Query.equal("user", userId)]
+    );
+
+    const savedPostDocuments = savedPosts.documents || [];
+
+    return savedPostDocuments;
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
+}
+
+export async function getPostDocumentsByPostIds(postIds: string[]) {
+  try {
+    const postDocuments = await Promise.all(
+      postIds.map(async (postId) => {
+        try {
+          const postDocument = await databases.getDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.postsCollectionId,
+            postId
+          );
+          return postDocument;
+        } catch (error) {
+          console.error(
+            `Error fetching post document with ID ${postId}:`,
+            error
+          );
+          return null;
+        }
+      })
+    );
+    return postDocuments.filter((doc) => doc !== null);
+  } catch (error) {
+    console.error("Error fetching post documents:", error);
+    return [];
+  }
+}
+
+export async function getUserById(userId: string) {
+  try {
+    const user = await databases.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.usersCollectionId,
+      userId
+    );
+    if (!user) throw Error;
+    return user;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function updateUserDetails(user: IUpdateUser) {
+  try {
+    const updatedUser = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.usersCollectionId,
+      user.userId,
+      {
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        bio: user.bio,
+        imageUrl: user.imageUrl,
+      }
+    );
+    if (!updatedUser) throw Error;
+  } catch (error) {
+    console.log(error);
   }
 }

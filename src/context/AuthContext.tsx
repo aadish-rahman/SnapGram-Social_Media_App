@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/appwrite/api";
+import { getCurrentUser, updateUserDetails } from "@/lib/appwrite/api";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IContextType, IUser } from "../types/index";
@@ -27,7 +27,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<IUser>(INITIAL_USER);
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
   const navigate = useNavigate();
 
   const checkAuthUser = async () => {
@@ -43,7 +42,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           bio: currentAccount.bio,
         });
         setIsAuthenticated(true);
-
         return true;
       }
       return false;

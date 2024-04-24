@@ -22,3 +22,11 @@ export const PostValidation = z.object({
   location: z.string().min(2).max(100),
   tags: z.string(),
 });
+
+export const ProfileValidation = z.object({
+  imageUrl: z.string().optional(),
+  name: z.string().min(1, { message: "Name is required" }),
+  username: z.string().min(1, { message: "Username is required" }),
+  email: z.string().email({ message: "Invalid email address" }),
+  bio: z.string().optional(),
+});
