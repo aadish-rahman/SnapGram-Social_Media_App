@@ -452,3 +452,49 @@ export async function updateUserDetails(user: IUpdateUser) {
     console.log(error);
   }
 }
+
+export async function toggleFollowUser(
+  userId: string,
+  followerId: string,
+  follow: boolean
+): Promise<boolean> {
+  try {
+    const user = await getUserById(userId);
+    if (!user) {
+      throw new Error("User not found.");
+    }
+
+    const followerUser = await getUserById(followerId);
+    if (!followerUser) {
+      throw new Error("Follower user not found.");
+    }
+
+    let updatedUser;
+    if (follow) {
+      updatedUser = await databases.updateDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.usersCollectionId,
+        followerId,
+        {
+          Followers: [...followerUser.Followers, userId],
+        }
+      );
+    } else {
+      updatedUser = await databases.updateDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.usersCollectionId,
+        followerId,
+        {
+          Followers: followerUser.Followers.filter(
+            (id: string) => id !== userId
+          ),
+        }
+      );
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error toggling follow:", error);
+    return false;
+  }
+}

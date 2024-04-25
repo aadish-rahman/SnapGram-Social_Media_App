@@ -1,7 +1,11 @@
 import GridPostList from "@/components/shared/GridPostList";
 import Loader from "@/components/shared/Loader";
+import { Button } from "@/components/ui/button";
 import { useUserContext } from "@/context/AuthContext";
-import { useGetUserById } from "@/lib/react-query/queriesAndMutations";
+import {
+  useGetUserById,
+  useToggleFollowUser,
+} from "@/lib/react-query/queriesAndMutations";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 
 const Profile = () => {
@@ -9,17 +13,30 @@ const Profile = () => {
   const { user: currentUser } = useUserContext();
   const { id } = useParams();
   const { data: userData, isFetching } = useGetUserById(id!);
+  const { mutate, isPending } = useToggleFollowUser();
+  console.log(userData);
 
   if (!userData || isFetching) {
     return <Loader />;
   }
 
   const posts = userData?.posts || [];
-  console.log(posts);
-
   const handleEditButton = () => {
     navigate(`/update-profile`);
   };
+
+  const isFollowing = userData.Followers.includes(currentUser.id);
+
+  const handleFollow = () => {
+    // Call the mutation hook to toggle follow status
+    mutate({
+      userId: currentUser.id, // ID of the user who is Following/Unfollowing
+      followerId: userData.$id, // ID of the user who is getting Followed/Unfollowed
+      follow: !isFollowing, // Invert the follow status
+    });
+  };
+
+  const followButtonLabel = isFollowing ? "Unfollow" : "Follow";
 
   return (
     <div className="profile-container">
@@ -58,17 +75,37 @@ const Profile = () => {
               </p>
               <div className="flex gap-10 mt-4">
                 <div className="flex flex-col ">
-                  <p className="text-primary-500">312</p>
+                  <p className="text-primary-500">{userData.posts.length}</p>
                   <p className="font-semibold">Posts</p>
                 </div>
                 <div className="flex flex-col">
-                  <p className="text-primary-500">312</p>
+                  <p className="text-primary-500">
+                    {userData.Followers.length}
+                  </p>
                   <p className="font-semibold">Followers</p>
                 </div>
                 <div className="flex flex-col">
-                  <p className="text-primary-500">312</p>
+                  <p className="text-primary-500">
+                    {userData.Following.length}
+                  </p>
                   <p className="font-semibold">Following</p>
                 </div>
+              </div>
+              <div className="flex gap-5 mt-4">
+                {userData.$id !== currentUser!.id && (
+                  <Button
+                    onClick={handleFollow}
+                    disabled={isPending}
+                    className="flex gap-2 justify-center px-4 py-2.5 text-sm font-semibold leading-5 text-center rounded-lg bg-neutral-900 text-zinc-100 hover:bg-primary-500 group"
+                  >
+                    {isPending ? <Loader /> : followButtonLabel}
+                  </Button>
+                )}
+                {userData.$id !== currentUser!.id && (
+                  <Button className="flex gap-2 justify-center px-4 py-2.5 text-sm font-semibold leading-5 text-center rounded-lg bg-neutral-900 text-zinc-100 hover:bg-primary-500 group">
+                    Message
+                  </Button>
+                )}
               </div>
               <div className="mt-3">
                 <p>{userData.bio}</p>

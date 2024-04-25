@@ -22,6 +22,7 @@ import {
   searchPosts,
   signInAccount,
   signOutAccount,
+  toggleFollowUser,
   updatePost,
   updateUserDetails,
 } from "../appwrite/api";
@@ -221,6 +222,22 @@ export const useUpdateUserDetails = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (user: IUpdateUser) => updateUserDetails(user),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["user"],
+      });
+    },
+  });
+};
+
+export const useToggleFollowUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (args: {
+      userId: string;
+      followerId: string;
+      follow: boolean;
+    }) => toggleFollowUser(args.userId, args.followerId, args.follow),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["user"],
