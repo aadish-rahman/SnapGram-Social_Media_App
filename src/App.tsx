@@ -16,6 +16,8 @@ import {
   UpdateProfile,
 } from "./_root/pages";
 import AllUsers from "./_root/pages/AllUsers";
+import Chats from "./_root/pages/Chats";
+import Followers from "./_root/pages/Followers";
 import "./globals.css";
 
 function App() {
@@ -39,6 +41,8 @@ function App() {
           <Route path="/posts/:id" element={<PostDetails />} />
           <Route path="/profile/:id/*" element={<Profile />} />
           <Route path="/update-profile" element={<UpdateProfile />} />
+          <Route path="/followers/:id" element={<Followers />} />
+          <Route path="/chats" element={<Chats />} />
         </Route>
       </Routes>
       <Toaster />

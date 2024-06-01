@@ -5,6 +5,16 @@ export type IContextType = {
   isAuthenticated: boolean;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
   checkAuthUser: () => Promise<boolean>;
+  selectedChat: any;
+  setSelectedChat: React.Dispatch<React.SetStateAction<any>>;
+  chats?: any;
+  setChats?: React.Dispatch<React.SetStateAction<any>>;
+};
+
+export type CreateMessageVariables = {
+  message: string;
+  chat: any;
+  sender: string;
 };
 
 export type INavLink = {

@@ -54,7 +54,10 @@ export async function saveUserToDB(user: {
 
 export async function signInAccount(user: { email: string; password: string }) {
   try {
-    const session = await account.createEmailSession(user.email, user.password);
+    const session = await account.createEmailPasswordSession(
+      user.email,
+      user.password
+    );
     return session;
   } catch (error) {
     console.log(error);
@@ -375,50 +378,6 @@ export async function searchPosts(searchTerm: string) {
   }
 }
 
-export async function getSavedPostDocumentsByUserId(userId: string) {
-  try {
-    const savedPosts = await databases.listDocuments(
-      appwriteConfig.databaseId,
-      appwriteConfig.savesCollectionId,
-      [Query.equal("user", userId)]
-    );
-
-    const savedPostDocuments = savedPosts.documents || [];
-
-    return savedPostDocuments;
-  } catch (error) {
-    console.log(error);
-    return [];
-  }
-}
-
-export async function getPostDocumentsByPostIds(postIds: string[]) {
-  try {
-    const postDocuments = await Promise.all(
-      postIds.map(async (postId) => {
-        try {
-          const postDocument = await databases.getDocument(
-            appwriteConfig.databaseId,
-            appwriteConfig.postsCollectionId,
-            postId
-          );
-          return postDocument;
-        } catch (error) {
-          console.error(
-            `Error fetching post document with ID ${postId}:`,
-            error
-          );
-          return null;
-        }
-      })
-    );
-    return postDocuments.filter((doc) => doc !== null);
-  } catch (error) {
-    console.error("Error fetching post documents:", error);
-    return [];
-  }
-}
-
 export async function getUserById(userId: string) {
   try {
     const user = await databases.getDocument(
@@ -496,5 +455,116 @@ export async function toggleFollowUser(
   } catch (error) {
     console.error("Error toggling follow:", error);
     return false;
+  }
+}
+
+export async function searchUsers(searchTerm: string) {
+  try {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) {
+      throw new Error("Current user not found");
+    }
+    const allUsers = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.usersCollectionId,
+      [Query.search("name", searchTerm)]
+    );
+
+    if (!allUsers) {
+      throw new Error("No users found");
+    }
+
+    const filteredUsers = allUsers.documents.filter(
+      (user) => user.accountId !== currentUser.accountId
+    );
+
+    return filteredUsers;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export async function accessChat(user1: any, user2: any) {
+  try {
+    console.log("Accessing chat with users: ", user1, user2);
+
+    const chat = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.chatsCollectionId,
+      [
+        Query.and([
+          Query.contains("userIds", user1),
+          Query.contains("userIds", user2),
+        ]),
+      ]
+    );
+
+    if (chat && chat.documents.length > 0) {
+      console.log("Chat found: ", chat);
+      return chat.documents[0];
+    } else {
+      const newChat = await databases.createDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.chatsCollectionId,
+        ID.unique(),
+        {
+          userIds: [user1, user2],
+          users: [user1, user2],
+        }
+      );
+      console.log("New chat created: ", newChat);
+      return newChat;
+    }
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+export async function getUserChats(userId: string) {
+  try {
+    const chats = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.chatsCollectionId,
+      [Query.contains("userIds", userId), Query.orderAsc("$updatedAt")]
+    );
+    return chats;
+  } catch (error) {
+    console.error("Failed to fetch user chats:", error);
+    throw error;
+  }
+}
+
+export async function createMessage(
+  content: string,
+  chatId: string,
+  senderId: string
+) {
+  try {
+    const message = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.messagesCollectionId,
+      ID.unique(),
+      { chat: chatId, message: content, sender: senderId }
+    );
+    return message;
+  } catch (error) {
+    console.error("Failed to create message:", error);
+    throw error;
+  }
+}
+
+export async function getChat(chatId: string) {
+  try {
+    const chat = await databases.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.chatsCollectionId,
+      chatId
+    );
+    return chat;
+  } catch (error) {
+    console.error("Failed to fetch chat:", error);
+    throw error;
   }
 }

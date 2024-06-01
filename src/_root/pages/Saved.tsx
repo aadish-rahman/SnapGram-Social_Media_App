@@ -1,42 +1,14 @@
-import { useEffect } from "react";
-
 import GridPostList from "@/components/shared/GridPostList";
 import Loader from "@/components/shared/Loader";
-import { getSavedPostDocumentsByUserId } from "@/lib/appwrite/api";
-import {
-  useGetCurrentUser,
-  useGetPostDocumentsByPostIds,
-  useGetSavedPostDocumentsByUserId,
-} from "@/lib/react-query/queriesAndMutations";
+import { useGetCurrentUser } from "@/lib/react-query/queriesAndMutations";
 
 const Saved = () => {
   const { data: currentUser } = useGetCurrentUser();
   console.log(currentUser);
 
-  const { data: savedPostDocuments } = useGetSavedPostDocumentsByUserId(
-    currentUser?.$id || ""
-  );
-
-  const postIds = savedPostDocuments?.map((doc) => doc.post.$id) || [];
-
-  const { data: postDocuments } = useGetPostDocumentsByPostIds(postIds);
-
-  useEffect(() => {
-    const fetchPosts = async () => {
-      if (currentUser) {
-        try {
-          // Fetch saved post documents by user ID using React Query hook
-          await getSavedPostDocumentsByUserId(currentUser.$id);
-
-          // No need to fetch post documents here because useGetPostDocumentsByPostIds hook is already fetching them
-        } catch (error) {
-          console.error("Error fetching saved post documents:", error);
-        }
-      }
-    };
-
-    fetchPosts();
-  }, [currentUser]);
+  // Extract saved post documents from currentUser data
+  const savedPostDocuments =
+    currentUser?.save.map((savedItem: { post: any }) => savedItem.post) || [];
 
   return (
     <div className="explore-container">
@@ -64,9 +36,9 @@ const Saved = () => {
       </div>
 
       <div className="flex flex-wrap w-full max-w-5xl gap-9">
-        {postDocuments ? (
+        {savedPostDocuments.length > 0 ? (
           <GridPostList
-            posts={postDocuments}
+            posts={savedPostDocuments}
             showStats={false}
             showUser={false}
           />

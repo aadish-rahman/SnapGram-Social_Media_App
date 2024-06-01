@@ -1,4 +1,10 @@
-import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
+import {
+  CreateMessageVariables,
+  INewPost,
+  INewUser,
+  IUpdatePost,
+  IUpdateUser,
+} from "@/types";
 import {
   useInfiniteQuery,
   useMutation,
@@ -6,20 +12,23 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import {
+  accessChat,
+  createMessage,
   createPost,
   createUserAccount,
   deletePost,
   deleteSavedPost,
+  getChat,
   getCurrentUser,
   getInfinitePosts,
   getPostById,
-  getPostDocumentsByPostIds,
   getRecentPosts,
-  getSavedPostDocumentsByUserId,
   getUserById,
+  getUserChats,
   likePost,
   savePost,
   searchPosts,
+  searchUsers,
   signInAccount,
   signOutAccount,
   toggleFollowUser,
@@ -197,20 +206,6 @@ export const useSearchPosts = (searchTerm: string) => {
   });
 };
 
-export const useGetSavedPostDocumentsByUserId = (userId: string) => {
-  return useQuery({
-    queryKey: ["savedPostDocuments", userId],
-    queryFn: () => getSavedPostDocumentsByUserId(userId),
-  });
-};
-
-export const useGetPostDocumentsByPostIds = (postIds: string[]) => {
-  return useQuery({
-    queryKey: ["postDocuments", postIds],
-    queryFn: () => getPostDocumentsByPostIds(postIds),
-  });
-};
-
 export const useGetUserById = (userId: string) => {
   return useQuery({
     queryKey: ["user", userId],
@@ -243,5 +238,47 @@ export const useToggleFollowUser = () => {
         queryKey: ["user"],
       });
     },
+  });
+};
+
+export const useSearchUsers = (searchTerm: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.SEARCH_USERS],
+    queryFn: async () => await searchUsers(searchTerm),
+  });
+};
+
+export const useAccessChat = () => {
+  return useMutation({
+    mutationFn: async (args: { user1: any; user2: any }) =>
+      await accessChat(args.user1, args.user2),
+  });
+};
+
+export const useGetUserChats = (userId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_USER_CHATS],
+    queryFn: async () => await getUserChats(userId),
+  });
+};
+
+export const useCreateMessage = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ message, chat, sender }: CreateMessageVariables) =>
+      createMessage(message, chat, sender),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_CHAT],
+      });
+    },
+  });
+};
+
+export const useGetChat = (chatId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_CHAT, chatId],
+    queryFn: async () => await getChat(chatId),
+    enabled: !!chatId,
   });
 };

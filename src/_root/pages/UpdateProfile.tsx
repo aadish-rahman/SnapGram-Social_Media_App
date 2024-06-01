@@ -20,7 +20,6 @@ import * as z from "zod";
 const UpdateProfile = () => {
   const { user: userData, setUser } = useUserContext();
   const { mutate: updateUserDetails } = useUpdateUserDetails();
-  // const fileInputRef = useRef(null);
   const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof ProfileValidation>>({
@@ -62,11 +61,6 @@ const UpdateProfile = () => {
     return <Loader />;
   }
 
-  // const handleProfilePictureChange = () => {
-  //   // Trigger click event on file input
-  //   fileInputRef.current.click();
-  // };
-
   return (
     <Form {...form}>
       <div className="flex flex-col justify-center flex-1 w-full px-5 py-10 overflow-scroll md:p-14 custom-scrollbar ">
@@ -86,18 +80,6 @@ const UpdateProfile = () => {
             alt="Profile Pic"
             className="shrink-0 max-w-full aspect-square w-[100px] rounded-full"
           />
-          <div>
-            <input
-              type="file"
-              accept="image/*"
-              {...form.register("imageUrl")}
-              // ref={fileInputRef}
-              className="hidden"
-            />
-            {/* <Button className="my-auto" onClick={handleProfilePictureChange}>
-              Change Profile Picture
-            </Button> */}
-          </div>
         </div>
         <div className="flex justify-center">
           <div className="flex flex-col w-[60%] justify-center mt-10 text-lg font-semibold leading-6 text-zinc-100">

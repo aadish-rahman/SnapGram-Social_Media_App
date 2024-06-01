@@ -11,10 +11,19 @@
 
   body {
     @apply min-h-screen text-white bg-dark-1 font-inter;
+    overflow: hidden;
   }
 }
 
 @layer utilities {
+  .message-container {
+    @apply flex-1 overflow-y-auto custom-scrollbar;
+  }
+
+  .fixed-bottom {
+    @apply fixed w-full px-4 bottom-16 bg-neutral-950 md:bottom-0 md:px-0;
+  }
+
   /* TYPOGRAPHY */
   .h1-bold {
     @apply text-[36px] font-bold leading-[140%] tracking-tighter;
@@ -224,7 +233,7 @@
 
   /* Left sidebar */
   .leftsidebar {
-    @apply hidden md:flex px-6 py-10 flex-col justify-between min-w-[270px] bg-dark-2;
+    @apply hidden md:flex px-6 py-10 flex-col justify-between bg-dark-2 w-[20%];
   }
 
   .leftsidebar-link {

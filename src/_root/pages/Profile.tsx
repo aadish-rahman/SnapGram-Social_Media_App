@@ -14,7 +14,6 @@ const Profile = () => {
   const { id } = useParams();
   const { data: userData, isFetching } = useGetUserById(id!);
   const { mutate, isPending } = useToggleFollowUser();
-  console.log(userData);
 
   if (!userData || isFetching) {
     return <Loader />;
@@ -78,18 +77,24 @@ const Profile = () => {
                   <p className="text-primary-500">{userData.posts.length}</p>
                   <p className="font-semibold">Posts</p>
                 </div>
-                <div className="flex flex-col">
+                <NavLink
+                  to={`/followers/${userData.$id}`}
+                  className="flex flex-col"
+                >
                   <p className="text-primary-500">
                     {userData.Followers.length}
                   </p>
                   <p className="font-semibold">Followers</p>
-                </div>
-                <div className="flex flex-col">
+                </NavLink>
+                <NavLink
+                  to={`/followers/${userData.$id}`}
+                  className="flex flex-col"
+                >
                   <p className="text-primary-500">
                     {userData.Following.length}
                   </p>
                   <p className="font-semibold">Following</p>
-                </div>
+                </NavLink>
               </div>
               <div className="flex gap-5 mt-4">
                 {userData.$id !== currentUser!.id && (
