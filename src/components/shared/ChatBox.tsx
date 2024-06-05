@@ -1,5 +1,6 @@
 import { useUserContext } from "@/context/AuthContext";
 import { appwriteConfig, client } from "@/lib/appwrite/config";
+import {} from "appwrite";
 import {
   useCreateMessage,
   useGetChat,
@@ -11,9 +12,13 @@ import { v4 as uuidv4 } from "uuid";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 
-type ChatBoxProps = { chat: any; onBack: () => void };
+type ChatBoxProps = {
+  chat: any;
+  onBack: () => void;
+  setLatestMessageArray: any;
+};
 
-const ChatBox = ({ chat, onBack }: ChatBoxProps) => {
+const ChatBox = ({ chat, onBack, setLatestMessageArray }: ChatBoxProps) => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
   const { user: currentUser } = useUserContext();
@@ -23,7 +28,6 @@ const ChatBox = ({ chat, onBack }: ChatBoxProps) => {
 
   useEffect(() => {
     if (chatData) {
-      console.log(chatData);
       setMessages(chatData.messages);
     }
   }, [chatData]);
@@ -51,6 +55,16 @@ const ChatBox = ({ chat, onBack }: ChatBoxProps) => {
                 ? updatedMessages
                 : [...updatedMessages, newMessage];
             });
+
+            // Update the latestMessageArray
+            setLatestMessageArray(
+              (prevArray: { chatId: string; latestMessage: any }[]) =>
+                prevArray.map((item) =>
+                  item.chatId === chat.$id
+                    ? { ...item, latestMessage: newMessage }
+                    : item
+                )
+            );
           }
         }
       }
@@ -59,7 +73,7 @@ const ChatBox = ({ chat, onBack }: ChatBoxProps) => {
     return () => {
       unsubscribe();
     };
-  }, [chat.$id, currentUser.id]);
+  }, [chat.$id, currentUser.id, setLatestMessageArray]);
 
   useEffect(() => {
     if (messageContainerRef.current) {
